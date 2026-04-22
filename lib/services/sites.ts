@@ -35,7 +35,7 @@ export async function listSitesForUser(userId: string): Promise<SiteCardView[]> 
     where: { userId },
     select: { organizationId: true },
   });
-  const orgIds = memberships.map((m) => m.organizationId);
+  const orgIds = memberships.map((m: (typeof memberships)[number]) => m.organizationId);
   if (!orgIds.length) return [];
 
   const sites = await prisma.site.findMany({
@@ -59,7 +59,7 @@ export async function listSitesForUser(userId: string): Promise<SiteCardView[]> 
     orderBy: { name: "asc" },
   });
 
-  return sites.map((s) => {
+  return sites.map((s: (typeof sites)[number]) => {
     const latest = s.metrics[0];
     const conn = s.connections[0];
 
@@ -142,7 +142,7 @@ export async function getSiteDetail(
   }
 
   const latest = site.metrics[0];
-  const hasDemoConn = site.connections.some((c) => c.demoMode);
+  const hasDemoConn = site.connections.some((c: (typeof site.connections)[number]) => c.demoMode);
   const noLiveData = !latest;
   const shouldSynthesize = noLiveData && (GLOBAL_DEMO || hasDemoConn);
 
@@ -160,7 +160,7 @@ export async function getSiteDetail(
 
   const productionSeries =
     series.length > 4
-      ? series.map((p) => ({
+      ? series.map((p: (typeof series)[number]) => ({
           t: p.timestamp.toISOString(),
           w: Math.max(0, p.currentPowerW ?? 0),
         }))
@@ -196,7 +196,7 @@ export async function getSiteDetail(
     lastUpdateAt: latest?.timestamp ?? null,
     connectionStatus: firstConn?.status ?? "NONE",
     isDemo: hasDemoConn || (shouldSynthesize && !firstConn),
-    connections: site.connections.map((c) => ({
+    connections: site.connections.map((c: (typeof site.connections)[number]) => ({
       id: c.id,
       code: c.providerType.code,
       displayName: c.providerType.displayName,

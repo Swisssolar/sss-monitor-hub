@@ -136,7 +136,7 @@ export async function syncAllConnections(): Promise<{
     select: { id: true },
   });
   const results = await Promise.allSettled(
-    connections.map((c) => syncConnection(c.id))
+    connections.map((c: (typeof connections)[number]) => syncConnection(c.id))
   );
   const ok = results.filter(
     (r) => r.status === "fulfilled" && r.value.ok

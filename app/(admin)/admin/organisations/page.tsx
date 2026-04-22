@@ -47,7 +47,7 @@ export default async function OrganisationsPage() {
               </tr>
             </thead>
             <tbody>
-              {orgs.map((o) => (
+              {orgs.map((o: (typeof orgs)[number]) => (
                 <tr
                   key={o.id}
                   className="border-b border-swiss-line last:border-b-0 hover:bg-swiss-paper transition"

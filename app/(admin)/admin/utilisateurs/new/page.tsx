@@ -52,7 +52,7 @@ export default async function NewUser() {
           >
             <Select id="organizationId" name="organizationId">
               <option value="">— Aucune —</option>
-              {orgs.map((o) => (
+              {orgs.map((o: (typeof orgs)[number]) => (
                 <option key={o.id} value={o.id}>
                   {o.name}
                 </option>

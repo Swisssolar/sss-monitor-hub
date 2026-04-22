@@ -23,7 +23,7 @@ export default async function NewSite() {
           <Field label="Organisation *" htmlFor="organizationId">
             <Select id="organizationId" name="organizationId" required>
               <option value="">— Choisir —</option>
-              {orgs.map((o) => (
+              {orgs.map((o: (typeof orgs)[number]) => (
                 <option key={o.id} value={o.id}>
                   {o.name}
                 </option>

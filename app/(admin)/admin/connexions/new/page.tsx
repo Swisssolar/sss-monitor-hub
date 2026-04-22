@@ -34,7 +34,7 @@ export default async function NewConnection() {
             <Field label="Bâtiment *" htmlFor="siteId">
               <Select id="siteId" name="siteId" required>
                 <option value="">— Choisir —</option>
-                {sites.map((s) => (
+                {sites.map((s: (typeof sites)[number]) => (
                   <option key={s.id} value={s.id}>
                     {s.organization.name} — {s.name}
                   </option>
@@ -45,7 +45,7 @@ export default async function NewConnection() {
             <Field label="Fournisseur *" htmlFor="providerTypeId">
               <Select id="providerTypeId" name="providerTypeId" required>
                 <option value="">— Choisir —</option>
-                {providerTypes.map((p) => (
+                {providerTypes.map((p: (typeof providerTypes)[number]) => (
                   <option key={p.id} value={p.id}>
                     {p.displayName} · {p.authMode}
                   </option>

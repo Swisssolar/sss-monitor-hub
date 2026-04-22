@@ -24,7 +24,7 @@ export default async function AdminHome() {
       }),
     ]);
 
-  const errorCount = connections.filter((c) => c.status === "ERROR").length;
+  const errorCount = connections.filter((c: (typeof connections)[number]) => c.status === "ERROR").length;
 
   return (
     <>
@@ -66,7 +66,7 @@ export default async function AdminHome() {
             </div>
           ) : (
             <ul className="divide-y divide-swiss-line">
-              {connections.map((c) => (
+              {connections.map((c: (typeof connections)[number]) => (
                 <li
                   key={c.id}
                   className="py-3 flex items-center justify-between gap-3"
@@ -100,7 +100,7 @@ export default async function AdminHome() {
                 Aucun événement.
               </li>
             ) : (
-              recentLogs.map((l) => (
+              recentLogs.map((l: (typeof recentLogs)[number]) => (
                 <li key={l.id} className="py-2.5 text-[12.5px]">
                   <div className="flex items-center justify-between gap-2">
                     <code className="font-mono text-[11.5px] text-swiss-ink bg-swiss-line/40 px-1.5 py-0.5 rounded-sm truncate">

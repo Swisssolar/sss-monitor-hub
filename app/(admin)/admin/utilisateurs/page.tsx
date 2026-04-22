@@ -44,7 +44,7 @@ export default async function UsersPage() {
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {users.map((u: (typeof users)[number]) => (
                 <tr
                   key={u.id}
                   className="border-b border-swiss-line last:border-b-0 hover:bg-swiss-paper transition"
@@ -66,7 +66,7 @@ export default async function UsersPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-[13px] text-swiss-mute">
-                    {u.memberships.map((m) => m.organization.name).join(", ") ||
+                    {u.memberships.map((m: (typeof u.memberships)[number]) => m.organization.name).join(", ") ||
                       "—"}
                   </td>
                   <td className="px-5 py-3.5 text-[12.5px] text-swiss-mute">

@@ -51,7 +51,7 @@ export default async function SitesPage() {
               </tr>
             </thead>
             <tbody>
-              {sites.map((s) => (
+              {sites.map((s: (typeof sites)[number]) => (
                 <tr
                   key={s.id}
                   className="border-b border-swiss-line last:border-b-0 hover:bg-swiss-paper transition"

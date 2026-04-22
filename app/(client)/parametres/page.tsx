@@ -44,7 +44,7 @@ export default async function ParametresPage() {
                 Aucune organisation rattachée.
               </li>
             ) : (
-              memberships.map((m) => (
+              memberships.map((m: (typeof memberships)[number]) => (
                 <li
                   key={m.id}
                   className="py-3 first:pt-0 last:pb-0 flex items-center justify-between"

@@ -27,7 +27,7 @@ async function main() {
   }
 
   const providerByCode = Object.fromEntries(
-    (await prisma.providerType.findMany()).map((p) => [p.code, p])
+    (await prisma.providerType.findMany()).map((p: { code: string; id: string; displayName: string; authMode: string; isActive: boolean; createdAt: Date }) => [p.code, p])
   );
 
   // ---------------------------------------------------------------------------

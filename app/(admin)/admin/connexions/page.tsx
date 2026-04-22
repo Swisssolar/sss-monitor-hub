@@ -73,7 +73,7 @@ export default async function ConnexionsPage({
               </tr>
             </thead>
             <tbody>
-              {connections.map((c) => {
+              {connections.map((c: (typeof connections)[number]) => {
                 const isEnphase = c.providerType.code === "ENPHASE";
                 const needsOAuth =
                   isEnphase && !c.demoMode && !c.accessTokenEncrypted;

@@ -26,8 +26,9 @@ async function main() {
     });
   }
 
+  const allProviders = await prisma.providerType.findMany();
   const providerByCode = Object.fromEntries(
-    (await prisma.providerType.findMany()).map((p: { code: string; id: string; displayName: string; authMode: string; isActive: boolean; createdAt: Date }) => [p.code, p])
+    allProviders.map((p: (typeof allProviders)[number]) => [p.code, p])
   );
 
   // ---------------------------------------------------------------------------

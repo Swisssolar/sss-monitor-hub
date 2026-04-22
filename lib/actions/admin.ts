@@ -1,5 +1,8 @@
 "use server";
 
+/** Portable JSON-object type compatible with Prisma.InputJsonValue */
+type JsonObject = { [key: string]: string | number | boolean | null | JsonObject | JsonObject[] };
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -291,11 +294,11 @@ export async function startEnphaseOAuth(formData: FormData): Promise<void> {
   redirect(enphaseAuthorizeUrl(connectionId));
 }
 
-function safeJson(s: string): Record<string, unknown> | undefined {
+function safeJson(s: string): JsonObject | undefined {
   try {
     const v = JSON.parse(s);
     if (v && typeof v === "object" && !Array.isArray(v)) {
-      return v as Record<string, unknown>;
+      return v as JsonObject;
     }
     return undefined;
   } catch {

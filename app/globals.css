@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Geist is shipped via Vercel's font CDN when available; fall back to
+   system stack. Kept deliberately minimal — no extra font hosting. */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.1.0/files/geist-latin-wght-normal.woff2")
+    format("woff2-variations");
+}
+
+:root {
+  --paper: #FAFAF7;
+  --ink: #0A0A0B;
+  --line: #E6E4DE;
+  --mute: #6B6963;
+  --red: #E30613;
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-feature-settings: "ss01" on, "cv11" on;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection color — tie to brand red */
+::selection {
+  background: var(--red);
+  color: #fff;
+}
+
+/* Thin horizontal rule, brand-consistent */
+.hairline {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Number display — oversized metric figure */
+.metric-figure {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Tiny uppercase eyebrow label */
+.eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+  font-weight: 500;
+}
+
+/* Live dot — subtle breathing */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--red);
+  box-shadow: 0 0 0 0 rgba(227, 6, 19, 0.4);
+  animation: live-breathe 2.2s ease-out infinite;
+}
+@keyframes live-breathe {
+  0% {
+    box-shadow: 0 0 0 0 rgba(227, 6, 19, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(227, 6, 19, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(227, 6, 19, 0);
+  }
+}
+
+/* Page-level reveal: staggered children use --i */
+.stagger > * {
+  opacity: 0;
+  animation: fade-up 0.55s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ultra-thin focus ring, accessible */
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Prevent iOS zoom on focus without breaking zoom */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Utility: fine internal divider cells for tables */
+.cell-div {
+  border-bottom: 1px solid var(--line);
+}

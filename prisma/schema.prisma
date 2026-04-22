@@ -1,0 +1,216 @@
+// Swiss Solar System Monitor Hub — Prisma schema
+// Single source of truth for the data model.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Identity & access
+// -----------------------------------------------------------------------------
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum MembershipRole {
+  OWNER
+  MANAGER
+  VIEWER
+}
+
+model User {
+  id             String       @id @default(cuid())
+  name           String
+  email          String       @unique
+  passwordHash   String
+  role           UserRole     @default(CLIENT)
+  lastLoginAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  memberships    Membership[]
+  auditLogs      AuditLog[]   @relation("actor")
+}
+
+model Organization {
+  id             String       @id @default(cuid())
+  name           String
+  contactName    String?
+  contactEmail   String?
+  phone          String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  memberships    Membership[]
+  sites          Site[]
+}
+
+model Membership {
+  id                     String         @id @default(cuid())
+  userId                 String
+  organizationId         String
+  roleWithinOrganization MembershipRole @default(VIEWER)
+  createdAt              DateTime       @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
+// -----------------------------------------------------------------------------
+// Sites & monitoring providers
+// -----------------------------------------------------------------------------
+
+enum ProviderAuthMode {
+  OAUTH          // Enphase
+  API_TOKEN      // Victron, Huawei
+  LOCAL_ENDPOINT // Fronius local API
+  LINK_ONLY      // GenericLink fallback
+}
+
+enum ProviderCode {
+  ENPHASE
+  FRONIUS
+  VICTRON
+  HUAWEI
+  SOLAX
+  GENERIC_LINK
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  PENDING
+  ERROR
+  LINK_ONLY
+  DEMO
+}
+
+model Site {
+  id                 String  @id @default(cuid())
+  organizationId     String
+  name               String
+  address            String?
+  city               String?
+  postalCode         String?
+  country            String  @default("CH")
+  kwcInstalled       Float?
+  batteryKwh         Float?
+  providerPrimary    ProviderCode?
+  externalPortalUrl  String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connections    ProviderConnection[]
+  metrics        SiteMetricSnapshot[]
+
+  @@index([organizationId])
+}
+
+model ProviderType {
+  id          String            @id @default(cuid())
+  code        ProviderCode      @unique
+  displayName String
+  authMode    ProviderAuthMode
+  isActive    Boolean           @default(true)
+  iconUrl     String?
+
+  connections ProviderConnection[]
+}
+
+model ProviderConnection {
+  id                        String           @id @default(cuid())
+  siteId                    String
+  providerTypeId            String
+
+  status                    ConnectionStatus @default(PENDING)
+  demoMode                  Boolean          @default(false)
+
+  // Identifier on the provider side (enphase system_id, vrm installation_id, …)
+  externalAccountIdentifier String?
+
+  // Encrypted OAuth / API secrets. Never stored in plaintext.
+  accessTokenEncrypted      String?
+  refreshTokenEncrypted     String?
+  tokenExpiresAt            DateTime?
+
+  // Per-connection config (Fronius local URL, Huawei company ID, etc.)
+  apiBaseUrl                String?
+  metadataJson              Json?
+
+  lastSyncAt                DateTime?
+  lastError                 String?
+
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt
+
+  site         Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  providerType ProviderType @relation(fields: [providerTypeId], references: [id])
+  snapshots    SiteMetricSnapshot[]
+
+  @@index([siteId])
+  @@index([providerTypeId])
+}
+
+// -----------------------------------------------------------------------------
+// Time-series snapshots
+// -----------------------------------------------------------------------------
+
+model SiteMetricSnapshot {
+  id                   String   @id @default(cuid())
+  siteId               String
+  providerConnectionId String
+
+  timestamp            DateTime @default(now())
+
+  currentPowerW        Float?
+  dailyEnergyWh        Float?
+  monthlyEnergyWh      Float?
+  yearlyEnergyWh       Float?
+  lifetimeEnergyWh     Float?
+
+  batterySoc           Float?   // 0-100
+  gridImportW          Float?
+  gridExportW          Float?
+  selfConsumptionPct   Float?   // 0-100
+  co2SavedKg           Float?
+
+  rawJson              Json?
+
+  site               Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  providerConnection ProviderConnection @relation(fields: [providerConnectionId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, timestamp(sort: Desc)])
+  @@index([providerConnectionId, timestamp(sort: Desc)])
+}
+
+// -----------------------------------------------------------------------------
+// Audit log
+// -----------------------------------------------------------------------------
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  actorUserId  String?
+  action       String
+  entityType   String
+  entityId     String?
+  payloadJson  Json?
+  createdAt    DateTime @default(now())
+
+  actor User? @relation("actor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
+}

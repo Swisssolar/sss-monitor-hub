@@ -86,7 +86,7 @@ export async function listSitesForUser(userId: string): Promise<SiteCardView[]> 
       batterySoc: latest?.batterySoc ?? synth?.batterySoc ?? null,
       lastUpdateAt: latest?.timestamp ?? null,
       connectionStatus,
-      isDemo: Boolean(conn?.demoMode) || (shouldSynthesize && connectionStatus === "NONE"),
+      isDemo: Boolean(conn?.demoMode) || (shouldSynthesize && !conn),
     };
   });
 }

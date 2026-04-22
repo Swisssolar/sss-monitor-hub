@@ -4,13 +4,14 @@ import { prisma } from "@/lib/prisma";
  * Portable JSON-serialisable value type — same shape as Prisma.InputJsonValue
  * but defined locally to avoid depending on the generated Prisma namespace.
  */
+// Prisma's InputJsonValue does not include top-level null.
+// Use undefined to skip setting a nullable JSON field.
 type JsonValue =
   | string
   | number
   | boolean
-  | null
   | JsonValue[]
-  | { [key: string]: JsonValue };
+  | { [key: string]: JsonValue | null | undefined };
 
 export async function audit(opts: {
   actorUserId?: string | null;
